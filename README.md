@@ -1,6 +1,6 @@
 # RationalMath
 
-Solidity library for math with rational numbers.
+Solidity library for performing calculations with rational numbers.
 
 ## Installation
 

@@ -5,7 +5,6 @@ pragma solidity ^0.8.13;
 type Rational is uint256;
 
 using {add as +, sub as -, mul as *, div as /, eq as ==, neq as !=} for Rational global;
-using RationalLib for Rational global;
 
 // ======================================== CONVERSIONS ========================================
 

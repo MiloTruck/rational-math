@@ -42,9 +42,7 @@ contract Vault {
     }
 
     function _convertToShares(uint256 amount) internal view returns (Rational memory) {
-        if (totalShares.numerator == 0) {
-            return RationalMath.fromU256(amount);
-        }
+        if (totalShares.numerator == 0) return RationalMath.fromU256(amount);
 
         Rational memory assets = RationalMath.fromU256(amount);
         Rational memory totalAssets = RationalMath.fromU256(asset.balanceOf(address(this)));

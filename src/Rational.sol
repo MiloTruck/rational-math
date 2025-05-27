@@ -89,9 +89,11 @@ function fromRational(Rational v) pure returns (uint256 numerator, uint256 denom
 }
 
 function toRational(uint256 numerator, uint256 denominator) pure returns (Rational) {
-    uint256 d = gcd(numerator, denominator);
-    numerator /= d;
-    denominator /= d;
+    if (numerator > 0) {
+        uint256 d = gcd(numerator, denominator);
+        numerator /= d;
+        denominator /= d;
+    }
 
     require(numerator <= type(uint128).max && denominator <= type(uint128).max, "Overflow");
 

@@ -103,9 +103,11 @@ contract RationalTest is Test {
     }
 
     function resultOverflowsUint128(uint256 numerator, uint256 denominator) internal pure returns (bool) {
-        uint256 d = gcd(numerator, denominator);
-        numerator /= d;
-        denominator /= d;
+        if (numerator > 0) {
+            uint256 d = gcd(numerator, denominator);
+            numerator /= d;
+            denominator /= d;
+        }
 
         return numerator > type(uint128).max || denominator > type(uint128).max;
     }
@@ -127,6 +129,27 @@ contract RationalTest is Test {
         return abi.decode(data, (uint256, uint256));
     }
 
+    function test_eq(uint256 a, uint256 b, uint256 c, uint256 d) public {
+        // Bounds
+        a = bound(a, 0, type(uint128).max);
+        b = bound(b, 1, type(uint128).max);
+        c = bound(c, 0, type(uint128).max);
+        d = bound(d, 1, type(uint128).max);
+
+        // Skip if numerator or denominator overflows uint128
+        if (resultOverflowsUint128(a * d, b * c)) return;
+
+        // Compute z = x cmp y
+        Rational x = toRational(a, b);
+        Rational y = toRational(c, d);
+        uint256 z = eq(x, y) ? 1 : 0;
+
+        // Check result is equal to python implementation
+        (uint256 res,) = ffi_result("eq", a, b, c, d);
+        assertEq(res, z);
+    }
+
+    
     function test_lt(uint256 a, uint256 b, uint256 c, uint256 d) public {
         // Bounds
         a = bound(a, 0, type(uint128).max);
@@ -144,6 +167,90 @@ contract RationalTest is Test {
 
         // Check result is equal to python implementation
         (uint256 res,) = ffi_result("lt", a, b, c, d);
+        assertEq(res, z);
+    }
+
+    
+    function test_gt(uint256 a, uint256 b, uint256 c, uint256 d) public {
+        // Bounds
+        a = bound(a, 0, type(uint128).max);
+        b = bound(b, 1, type(uint128).max);
+        c = bound(c, 0, type(uint128).max);
+        d = bound(d, 1, type(uint128).max);
+
+        // Skip if numerator or denominator overflows uint128
+        if (resultOverflowsUint128(a * d, b * c)) return;
+
+        // Compute z = x cmp y
+        Rational x = toRational(a, b);
+        Rational y = toRational(c, d);
+        uint256 z = gt(x, y) ? 1 : 0;
+
+        // Check result is equal to python implementation
+        (uint256 res,) = ffi_result("gt", a, b, c, d);
+        assertEq(res, z);
+    }
+
+    
+    function test_neq(uint256 a, uint256 b, uint256 c, uint256 d) public {
+        // Bounds
+        a = bound(a, 0, type(uint128).max);
+        b = bound(b, 1, type(uint128).max);
+        c = bound(c, 0, type(uint128).max);
+        d = bound(d, 1, type(uint128).max);
+
+        // Skip if numerator or denominator overflows uint128
+        if (resultOverflowsUint128(a * d, b * c)) return;
+
+        // Compute z = x cmp y
+        Rational x = toRational(a, b);
+        Rational y = toRational(c, d);
+        uint256 z = neq(x, y) ? 1 : 0;
+
+        // Check result is equal to python implementation
+        (uint256 res,) = ffi_result("neq", a, b, c, d);
+        assertEq(res, z);
+    }
+
+    
+    function test_lte(uint256 a, uint256 b, uint256 c, uint256 d) public {
+        // Bounds
+        a = bound(a, 0, type(uint128).max);
+        b = bound(b, 1, type(uint128).max);
+        c = bound(c, 0, type(uint128).max);
+        d = bound(d, 1, type(uint128).max);
+
+        // Skip if numerator or denominator overflows uint128
+        if (resultOverflowsUint128(a * d, b * c)) return;
+
+        // Compute z = x cmp y
+        Rational x = toRational(a, b);
+        Rational y = toRational(c, d);
+        uint256 z = lte(x, y) ? 1 : 0;
+
+        // Check result is equal to python implementation
+        (uint256 res,) = ffi_result("lte", a, b, c, d);
+        assertEq(res, z);
+    }
+
+    
+    function test_gte(uint256 a, uint256 b, uint256 c, uint256 d) public {
+        // Bounds
+        a = bound(a, 0, type(uint128).max);
+        b = bound(b, 1, type(uint128).max);
+        c = bound(c, 0, type(uint128).max);
+        d = bound(d, 1, type(uint128).max);
+
+        // Skip if numerator or denominator overflows uint128
+        if (resultOverflowsUint128(a * d, b * c)) return;
+
+        // Compute z = x cmp y
+        Rational x = toRational(a, b);
+        Rational y = toRational(c, d);
+        uint256 z = gte(x, y) ? 1 : 0;
+
+        // Check result is equal to python implementation
+        (uint256 res,) = ffi_result("gte", a, b, c, d);
         assertEq(res, z);
     }
 }

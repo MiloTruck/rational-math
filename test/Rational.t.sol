@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {LibString} from "lib/solmate/src/utils/LibString.sol";
-import {Rational, RationalLib, fromRational, toRational, gcd} from "src/Rational.sol";
+import {Rational, RationalLib, fromRational, toRational, gcd, cmp, eq, lt, gt, neq, lte, gte} from "src/Rational.sol";
 
 contract RationalTest is Test {
     using LibString for uint256;
@@ -115,7 +115,7 @@ contract RationalTest is Test {
         returns (uint256, uint256)
     {
         string[] memory inputs = new string[](7);
-        inputs[0] = "python3";
+        inputs[0] = "python";
         inputs[1] = "rational.py";
         inputs[2] = op;
         inputs[3] = a.toString();
@@ -125,5 +125,25 @@ contract RationalTest is Test {
         bytes memory data = vm.ffi(inputs);
 
         return abi.decode(data, (uint256, uint256));
+    }
+
+    function test_lt(uint256 a, uint256 b, uint256 c, uint256 d) public {
+        // Bounds
+        a = bound(a, 0, type(uint128).max);
+        b = bound(b, 1, type(uint128).max);
+        c = bound(c, 0, type(uint128).max);
+        d = bound(d, 1, type(uint128).max);
+
+        // Skip if numerator or denominator overflows uint128
+        if (resultOverflowsUint128(a * d, b * c)) return;
+
+        // Compute z = x cmp y
+        Rational x = toRational(a, b);
+        Rational y = toRational(c, d);
+        uint256 z = lt(x, y) ? 1 : 0;
+
+        // Check result is equal to python implementation
+        (uint256 res,) = ffi_result("lt", a, b, c, d);
+        assertEq(res, z);
     }
 }

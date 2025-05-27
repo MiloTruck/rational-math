@@ -21,6 +21,8 @@ if __name__ == "__main__":
         z = x * y
     elif operation == "div":
         z = x / y
+    elif operation == "lt":
+        z = x < y
 
     # Print z as a abi-encoded (uint256, uint256)
     print(z.numerator.to_bytes(32, byteorder="big").hex(), end="")

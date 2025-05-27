@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 // Upper 128 bits is the numerator, lower 128 bits is the denominator
 type Rational is uint256;
 
-using {add as +, sub as -, mul as *, div as /, eq as ==, neq as !=} for Rational global;
+using {add as +, sub as -, mul as *, div as /, eq as ==, neq as !=, gt as >, gte as >=, lt as <, lte as <=} for Rational global;
 
 // ======================================== CONVERSIONS ========================================
 
@@ -81,18 +81,6 @@ function div(Rational x, Rational y) pure returns (Rational) {
     return toRational(numerator, denominator);
 }
 
-function eq(Rational x, Rational y) pure returns (bool) {
-    (uint256 xNumerator,) = fromRational(x);
-    (uint256 yNumerator,) = fromRational(y);
-    if (xNumerator == 0 && yNumerator == 0) return true;
-
-    return Rational.unwrap(x) == Rational.unwrap(y);
-}
-
-function neq(Rational x, Rational y) pure returns (bool) {
-    return !eq(x, y);
-}
-
 // ======================================== HELPERS ========================================
 
 function fromRational(Rational v) pure returns (uint256 numerator, uint256 denominator) {
@@ -117,4 +105,39 @@ function gcd(uint256 x, uint256 y) pure returns (uint256) {
         x = t;
     }
     return x;
+}
+
+function cmp(Rational x, Rational y) pure returns (int256) {
+    (uint256 xNumerator, uint256 xDenominator) = fromRational(x);
+    (uint256 yNumerator, uint256 yDenominator) = fromRational(y);
+
+    // (a / b) * (c / d) = ac / bd
+    uint256 numerator = xNumerator * yDenominator;
+    uint256 denominator = xDenominator * yNumerator;
+
+    return int256(numerator) - int256(denominator);
+}
+
+function eq(Rational x, Rational y) pure returns (bool) {
+    return cmp(x, y) == 0;
+}
+
+function lt(Rational x, Rational y) pure returns (bool) {
+    return cmp(x, y) < 0;
+}
+
+function gt(Rational x, Rational y) pure returns (bool) {
+    return cmp(x, y) > 0;
+}
+
+function neq(Rational x, Rational y) pure returns (bool) {
+    return !eq(x, y);
+}
+
+function lte(Rational x, Rational y) pure returns (bool) {
+    return !gt(x, y);
+}
+
+function gte(Rational x, Rational y) pure returns (bool) {
+    return !lt(x, y);
 }
